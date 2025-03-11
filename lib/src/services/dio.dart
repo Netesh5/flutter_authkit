@@ -1,11 +1,12 @@
 import 'package:dio/dio.dart';
+import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 class DioClient {
   static final Dio _dio = Dio();
 
   static Dio get dio => _dio;
 
-  static void init(
+  void init(
       {required String baseUrl,
       required String token,
       int connectionTimeoutMs = 5000,
@@ -31,5 +32,7 @@ class DioClient {
         return handler.next(e);
       },
     ));
+
+    _dio.interceptors.add(PrettyDioLogger());
   }
 }
