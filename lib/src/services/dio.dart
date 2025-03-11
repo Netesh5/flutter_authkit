@@ -5,13 +5,19 @@ class DioClient {
 
   static Dio get dio => _dio;
 
-  static void init({required String baseUrl, required String token}) {
+  static void init(
+      {required String baseUrl,
+      required String token,
+      int connectionTimeoutMs = 5000,
+      int receiveTimeoutMs = 3000,
+      Map<String, dynamic>? headers}) {
     _dio.options.baseUrl = baseUrl;
-    _dio.options.connectTimeout = const Duration(milliseconds: 5000);
-    _dio.options.receiveTimeout = const Duration(milliseconds: 3000);
-    _dio.options.headers = {
-      'Content-Type': 'application/json',
-    };
+    _dio.options.connectTimeout = Duration(milliseconds: connectionTimeoutMs);
+    _dio.options.receiveTimeout = Duration(milliseconds: receiveTimeoutMs);
+    _dio.options.headers = headers ??
+        {
+          'Content-Type': 'application/json',
+        };
 
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) {
