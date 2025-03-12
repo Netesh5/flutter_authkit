@@ -3,43 +3,48 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 
 class TokenService {
   final String key;
-  final String expiryKey;
-  TokenService({this.key = "@Token", this.expiryKey = "@TokenExpiry"});
+  TokenService({this.key = "@Token"});
 
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   Future<void> saveToken({
     required String token,
   }) async {
-    await _storage.write(key: key, value: token);
-    await _storage.write(
-        key: expiryKey, value: getTokenExpiryDate(token).toIso8601String());
+    try {
+      await _storage.write(key: key, value: token);
+      DateTime expiryDate = JwtDecoder.getExpirationDate(token);
+      await _storage.write(
+          key: "$key-expiry", value: expiryDate.toIso8601String());
+    } on Exception catch (e) {
+      throw Exception("Error saving token: $e");
+    }
   }
 
   Future<String?> getToken() async {
-    return await _storage.read(key: key);
-  }
-
-  Future<DateTime?> getTokenExpiry() async {
-    String? expiryString = await _storage.read(key: expiryKey);
-    if (expiryString != null) {
-      return DateTime.parse(expiryString);
+    try {
+      return await _storage.read(key: key);
+    } on Exception catch (e) {
+      throw Exception("Error reading token: $e");
     }
-    return null;
   }
 
   Future<bool> isTokenExpired() async {
-    final expiryDate = await getTokenExpiry();
-    if (expiryDate == null) return true;
+    final token = await getToken();
+    final expiryString = await _storage.read(key: "$key-expiry");
+    if (token == null || expiryString == null) return true;
+    final expiryDate = DateTime.parse(expiryString);
     return DateTime.now().isAfter(expiryDate);
   }
 
   Future<void> deleteToken() async {
     await _storage.delete(key: key);
-    await _storage.delete(key: expiryKey);
   }
 
   DateTime getTokenExpiryDate(String token) {
-    return JwtDecoder.getExpirationDate(token);
+    try {
+      return JwtDecoder.getExpirationDate(token);
+    } on Exception catch (e) {
+      throw Exception("Error getting token expiry date: $e");
+    }
   }
 }
