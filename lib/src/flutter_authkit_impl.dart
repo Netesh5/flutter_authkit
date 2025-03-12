@@ -71,4 +71,22 @@ class FlutterAuthKit {
       throw AuthErrorHandler.fromDioError(e);
     }
   }
+
+  Future<String> getValidToken() async {
+    final token = await _tokenService.getToken();
+    if (token != null && !await _tokenService.isTokenExpired()) {
+      return token;
+    } else {
+      return await refreshAccessToken();
+    }
+  }
+
+  Future<String> refreshAccessToken() async {
+    final refreshToken = await _tokenService.getRefreshToken();
+    final res = await _dioClient.dio
+        .post('/refresh-token', data: {"refreshToken": refreshToken});
+    final newAccessToken = res.data['accessToken'];
+    await _tokenService.saveToken(token: newAccessToken);
+    return newAccessToken;
+  }
 }

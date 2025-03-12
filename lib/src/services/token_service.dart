@@ -38,13 +38,24 @@ class TokenService {
 
   Future<void> deleteToken() async {
     await _storage.delete(key: key);
+    await _storage.delete(key: "$key-expiry");
   }
 
-  DateTime getTokenExpiryDate(String token) {
+  Future<void> saveRefreshToken({
+    required String refreshToken,
+  }) async {
     try {
-      return JwtDecoder.getExpirationDate(token);
+      await _storage.write(key: "$key-refresh", value: refreshToken);
     } on Exception catch (e) {
-      throw Exception("Error getting token expiry date: $e");
+      throw Exception("Error saving refresh token: $e");
+    }
+  }
+
+  Future<String?> getRefreshToken() async {
+    try {
+      return await _storage.read(key: "$key-refresh");
+    } on Exception catch (e) {
+      throw Exception("Error reading refresh token: $e");
     }
   }
 }
