@@ -12,6 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_secure_storage: ^9.2.4  
+  jwt_decoder: ^2.0.1
   pretty_dio_logger: ^1.4.0
 
 dev_dependencies:
