@@ -2,9 +2,9 @@ import 'package:dio/dio.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 class DioClient {
-  static final Dio _dio = Dio();
+  final Dio _dio = Dio();
 
-  static Dio get dio => _dio;
+  Dio get dio => _dio;
 
   void init(
       {required String baseUrl,
