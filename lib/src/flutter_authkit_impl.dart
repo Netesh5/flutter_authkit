@@ -1,3 +1,4 @@
+import 'package:flutter_authkit/src/handler/auth_error_handler.dart';
 import 'package:flutter_authkit/src/services/dio.dart';
 
 class FlutterAuthKit {
@@ -6,6 +7,8 @@ class FlutterAuthKit {
     try {
       final res = await _dioClient.dio.post('/login', data: params);
       return res.data;
-    } on Exception catch (e) {}
+    } on AuthErrorHandler catch (e) {
+      throw e.message;
+    }
   }
 }
