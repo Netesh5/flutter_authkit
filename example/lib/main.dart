@@ -1,3 +1,4 @@
+import 'package:example/wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_authkit/flutter_authkit.dart';
 import 'package:flutter_authkit/src/core/services/dio.dart';
@@ -21,7 +22,19 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: MyHomePage(),
+      // home: MyHomePage(),
+      home: FutureBuilder(
+          future: wrapper(context),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return snapshot.data!;
+            }
+            return const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }),
     );
   }
 }
