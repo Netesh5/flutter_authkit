@@ -15,7 +15,7 @@ class DioClient {
     _dio.interceptors.add(_interceptor());
     if (kDebugMode) {
       _dio.interceptors
-          .add(PrettyDioLogger(requestBody: true, requestHeader: true));
+          .add(PrettyDioLogger(requestBody: true, responseBody: true));
     }
   }
 
@@ -31,7 +31,7 @@ class DioClient {
       baseUrl: baseUrl,
       connectTimeout: Duration(milliseconds: connectionTimeoutMs),
       receiveTimeout: Duration(milliseconds: receiveTimeoutMs),
-      headers: headers ?? {"Accept": "Application/json"},
+      headers: headers ?? {'Content-Type': 'application/json'},
     );
   }
 
@@ -43,12 +43,12 @@ class DioClient {
           options.headers = {
             ...(options.headers),
             "Authorization": "Bearer $token",
-            "Accept": "Application/json",
+            'Content-Type': 'application/json',
           };
         } else {
           options.headers = {
             ...(options.headers),
-            "Accept": "Application/json",
+            'Content-Type': 'application/json',
           };
         }
         return handler.next(options);
