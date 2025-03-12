@@ -72,6 +72,7 @@ class FlutterAuthKit {
     }
   }
 
+// Get Valid Token
   Future<String> getValidToken() async {
     final token = await _tokenService.getToken();
     if (token != null && !await _tokenService.isTokenExpired()) {
@@ -81,6 +82,7 @@ class FlutterAuthKit {
     }
   }
 
+  // Refresh Access Token
   Future<String> refreshAccessToken() async {
     final refreshToken = await _tokenService.getRefreshToken();
     final res = await _dioClient.dio
