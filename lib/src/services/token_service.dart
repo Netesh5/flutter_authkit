@@ -4,7 +4,7 @@ class TokenService {
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   Future<void> saveToken({required String key, required String token}) async {
-    await _storage.write(key: '', value: token);
+    await _storage.write(key: key, value: token);
   }
 
   Future<String?> getToken({required String key}) async {

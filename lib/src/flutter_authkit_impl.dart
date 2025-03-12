@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_authkit/src/handler/auth_error_handler.dart';
 import 'package:flutter_authkit/src/services/dio.dart';
 
@@ -12,8 +13,8 @@ class FlutterAuthKit {
     try {
       final res = await _dioClient.dio.post('/$loginEndPont', data: params);
       return fromJson(res.data);
-    } on AuthErrorHandler catch (e) {
-      throw e.message;
+    } on DioException catch (e) {
+      throw AuthErrorHandler.fromDioError(e);
     }
   }
 
@@ -25,8 +26,8 @@ class FlutterAuthKit {
     try {
       final res = await _dioClient.dio.post('/$registerEndpoint', data: params);
       return fromJson(res.data);
-    } on AuthErrorHandler catch (e) {
-      throw e.message;
+    } on DioException catch (e) {
+      throw AuthErrorHandler.fromDioError(e);
     }
   }
 
@@ -40,8 +41,8 @@ class FlutterAuthKit {
         return fromJson(res.data);
       }
       return res.data;
-    } on AuthErrorHandler catch (e) {
-      throw e.message;
+    } on DioException catch (e) {
+      throw AuthErrorHandler.fromDioError(e);
     }
   }
 }
