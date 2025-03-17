@@ -1,7 +1,7 @@
 import 'package:flutter_authkit/flutter_authkit.dart';
 
 class UserModel implements AuthResponse {
-  final String id;
+  final int id;
   final String username;
   final String email;
   final String firstName;
@@ -39,7 +39,7 @@ class UserModel implements AuthResponse {
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
-      id: map['id'] as String,
+      id: map['id'] as int,
       username: map['username'] as String,
       email: map['email'] as String,
       firstName: map['firstName'] as String,

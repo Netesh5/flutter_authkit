@@ -72,7 +72,9 @@ class FlutterAuthKit {
   // For Logout
   Future<void> logout({required String logoutEndpoint}) async {
     try {
-      await _dioClient.dio.post('/$logoutEndpoint');
+      if (logoutEndpoint.isNotEmpty) {
+        await _dioClient.dio.post('/$logoutEndpoint');
+      }
       await _tokenService.deleteToken();
     } on DioException catch (e) {
       throw AuthErrorHandler.fromDioError(e);
