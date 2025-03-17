@@ -26,6 +26,11 @@ class MyApp extends StatelessWidget {
       home: FutureBuilder(
           future: wrapper(context),
           builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
             if (snapshot.connectionState == ConnectionState.done) {
               return snapshot.data!;
             }
@@ -55,8 +60,8 @@ class MyHomePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             ElevatedButton(
-              onPressed: () {
-                _authKit.login<UserModel>(
+              onPressed: () async {
+                await _authKit.login<UserModel>(
                     loginEndpoint: "login",
                     params: {
                       "username": "emilys",

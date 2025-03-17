@@ -12,8 +12,8 @@ class Homepage extends StatelessWidget {
       ),
       body: Center(
         child: TextButton(
-            onPressed: () {
-              _authKit.logout(logoutEndpoint: "");
+            onPressed: () async {
+              await _authKit.logout(logoutEndpoint: "");
             },
             child: const Text("Log out")),
       ),

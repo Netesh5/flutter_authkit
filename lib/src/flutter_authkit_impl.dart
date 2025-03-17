@@ -51,6 +51,9 @@ class FlutterAuthKit {
 
     if (res is AuthResponse) {
       await _tokenService.saveToken(token: res.accessToken);
+      if (res.refreshToken.isNotEmpty) {
+        await _tokenService.saveRefreshToken(refreshToken: res.refreshToken);
+      }
     }
     return res;
   }
