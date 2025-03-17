@@ -1,7 +1,9 @@
+import 'package:example/homepage.dart';
 import 'package:example/model/user_model.dart';
 import 'package:example/wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_authkit/flutter_authkit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() async {
   DioClient().init(
@@ -16,30 +18,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return BlocProvider(
+      create: (context) => LoginCubit(),
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: BlocListener<LoginCubit, CommonState>(
+          listener: (context, state) {
+            if (state is SuccessState<UserModel>) {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => Homepage()));
+            }
+          },
+          child: MyHomePage(),
+        ),
       ),
-      // home: MyHomePage(),
-      home: FutureBuilder(
-          future: wrapper(context),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-            if (snapshot.connectionState == ConnectionState.done) {
-              return snapshot.data!;
-            }
-            return const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
-            );
-          }),
     );
   }
 }
@@ -61,13 +57,21 @@ class MyHomePage extends StatelessWidget {
           children: [
             ElevatedButton(
               onPressed: () async {
-                await _authKit.login<UserModel>(
-                    loginEndpoint: "login",
-                    params: {
+                // await _authKit.login<UserModel>(
+                //     loginEndpoint: "login",
+                //     params: {
+                //       "username": "emilys",
+                //       "password": "emilyspass",
+                //     },
+                //     fromJson: (json) => UserModel.fromMap(json));
+
+                context.read<LoginCubit>().login(
+                    "login",
+                    {
                       "username": "emilys",
                       "password": "emilyspass",
                     },
-                    fromJson: (json) => UserModel.fromMap(json));
+                    (json) => UserModel.fromMap(json));
               },
               child: const Text('Login'),
             ),
