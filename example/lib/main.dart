@@ -1,7 +1,7 @@
+import 'package:example/model/user_model.dart';
 import 'package:example/wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_authkit/flutter_authkit.dart';
-import 'package:flutter_authkit/src/core/services/dio.dart';
 
 void main() async {
   DioClient().init(
@@ -56,13 +56,13 @@ class MyHomePage extends StatelessWidget {
           children: [
             ElevatedButton(
               onPressed: () {
-                _authKit.login(
+                _authKit.login<UserModel>(
                     loginEndpoint: "login",
                     params: {
                       "username": "emilys",
                       "password": "emilyspass",
                     },
-                    fromJson: (json) => json);
+                    fromJson: (json) => UserModel.fromMap(json));
               },
               child: const Text('Login'),
             ),

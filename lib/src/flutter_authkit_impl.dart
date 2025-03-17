@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_authkit/src/core/enums/request_type.dart';
 import 'package:flutter_authkit/src/core/handler/auth_error_handler.dart';
+import 'package:flutter_authkit/src/core/models/auth_response.dart';
 import 'package:flutter_authkit/src/core/services/dio.dart';
 import 'package:flutter_authkit/src/core/services/token_service.dart';
 
@@ -41,12 +42,17 @@ class FlutterAuthKit {
     Map<String, dynamic>? params,
     required T Function(Map<String, dynamic>) fromJson,
   }) async {
-    return _request(
+    final res = await _request(
       endpoint: loginEndpoint,
       method: RequestType.POST,
       params: params,
       fromJson: fromJson,
     );
+
+    if (res is AuthResponse) {
+      await _tokenService.saveToken(token: res.accessToken);
+    }
+    return res;
   }
 
   // For Register
@@ -55,7 +61,7 @@ class FlutterAuthKit {
     Map<String, dynamic>? params,
     required T Function(Map<String, dynamic>) fromJson,
   }) async {
-    return _request(
+    return await _request(
       endpoint: registerEndpoint,
       method: RequestType.POST,
       params: params,
