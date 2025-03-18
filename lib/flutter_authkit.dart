@@ -9,3 +9,4 @@ export 'src/core/enums/request_type.dart';
 export 'src/core/cubits/auth_cubits/login_cubit.dart';
 export 'src/core/common/cubit_state.dart';
 export 'src/core/di/di.dart';
+export 'src/core/cubits/auth_cubits/logout_cubit.dart';

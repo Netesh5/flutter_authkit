@@ -28,6 +28,9 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(
           create: (context) => StartupCubit()..init(),
         ),
+        BlocProvider(
+          create: (context) => g<LogoutCubit>(),
+        ),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
@@ -37,7 +40,7 @@ class _MyAppState extends State<MyApp> {
         ),
         home: BlocListener<LoginCubit, CommonState>(listener: (context, state) {
           if (state is SuccessState<UserModel>) {
-            Navigator.of(context).push(
+            Navigator.of(context).pushReplacement(
               MaterialPageRoute(
                 builder: (context) => const Homepage(),
               ),

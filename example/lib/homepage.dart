@@ -1,20 +1,31 @@
+import 'package:example/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_authkit/flutter_authkit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class Homepage extends StatelessWidget {
   const Homepage({super.key});
-  // final FlutterAuthKit _authKit = FlutterAuthKit();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Homepage'),
       ),
-      body: Center(
-        child: TextButton(
-            onPressed: () async {
-              // await _authKit.logout(logoutEndpoint: "");
-            },
-            child: const Text("Log out")),
+      body: BlocListener<LogoutCubit, CommonState>(
+        listener: (context, state) {
+          if (state is SuccessState) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const MyHomePage()),
+            );
+          }
+        },
+        child: Center(
+          child: TextButton(
+              onPressed: () async {
+                context.read<LogoutCubit>().logOut();
+              },
+              child: const Text("Log out")),
+        ),
       ),
     );
   }

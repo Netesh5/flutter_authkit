@@ -11,6 +11,8 @@
 import 'package:flutter_authkit/flutter_authkit.dart' as _i701;
 import 'package:flutter_authkit/src/core/cubits/auth_cubits/login_cubit.dart'
     as _i351;
+import 'package:flutter_authkit/src/core/cubits/auth_cubits/logout_cubit.dart'
+    as _i231;
 import 'package:flutter_authkit/src/core/services/dio.dart' as _i8;
 import 'package:flutter_authkit/src/core/services/token_service.dart' as _i691;
 import 'package:flutter_authkit/src/flutter_authkit_impl.dart' as _i1024;
@@ -38,6 +40,8 @@ extension GetItInjectableX on _i174.GetIt {
         ));
     gh.factory<_i351.LoginCubit>(
         () => _i351.LoginCubit(authKit: gh<_i701.FlutterAuthKit>()));
+    gh.factory<_i231.LogoutCubit>(
+        () => _i231.LogoutCubit(authKit: gh<_i701.FlutterAuthKit>()));
     return this;
   }
 }
