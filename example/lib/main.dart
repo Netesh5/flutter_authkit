@@ -1,6 +1,5 @@
 import 'package:example/homepage.dart';
 import 'package:example/model/user_model.dart';
-import 'package:example/wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_authkit/flutter_authkit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,8 +28,11 @@ class MyApp extends StatelessWidget {
         home: BlocListener<LoginCubit, CommonState>(
           listener: (context, state) {
             if (state is SuccessState<UserModel>) {
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (context) => Homepage()));
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => Homepage(),
+                ),
+              );
             }
           },
           child: MyHomePage(),
@@ -57,14 +59,6 @@ class MyHomePage extends StatelessWidget {
           children: [
             ElevatedButton(
               onPressed: () async {
-                // await _authKit.login<UserModel>(
-                //     loginEndpoint: "login",
-                //     params: {
-                //       "username": "emilys",
-                //       "password": "emilyspass",
-                //     },
-                //     fromJson: (json) => UserModel.fromMap(json));
-
                 context.read<LoginCubit>().login(
                     "login",
                     {
