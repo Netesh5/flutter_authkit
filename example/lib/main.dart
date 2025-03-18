@@ -1,3 +1,4 @@
+import 'package:example/cubit/startup_cubit.dart';
 import 'package:example/homepage.dart';
 import 'package:example/model/user_model.dart';
 import 'package:flutter/material.dart';
@@ -9,31 +10,42 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => g<LoginCubit>(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => g<LoginCubit>(),
+        ),
+        BlocProvider(
+          create: (context) => StartupCubit()..init(),
+        ),
+      ],
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: BlocListener<LoginCubit, CommonState>(
-          listener: (context, state) {
-            if (state is SuccessState<UserModel>) {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => Homepage(),
-                ),
-              );
-            }
-          },
-          child: const MyHomePage(),
-        ),
+        home: BlocListener<LoginCubit, CommonState>(listener: (context, state) {
+          if (state is SuccessState<UserModel>) {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const Homepage(),
+              ),
+            );
+          }
+        }, child: BlocBuilder<StartupCubit, Widget>(builder: (context, state) {
+          return state;
+        })),
       ),
     );
   }
