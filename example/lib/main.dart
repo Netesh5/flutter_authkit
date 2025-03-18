@@ -5,10 +5,7 @@ import 'package:flutter_authkit/flutter_authkit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() async {
-  // DioClient().init(
-  //   baseUrl: 'https://dummyjson.com/auth',
-  // );
-
+  injectDependecies();
   runApp(const MyApp());
 }
 
@@ -35,7 +32,7 @@ class MyApp extends StatelessWidget {
               );
             }
           },
-          child: MyHomePage(),
+          child: const MyHomePage(),
         ),
       ),
     );
@@ -43,9 +40,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatelessWidget {
-  MyHomePage({super.key});
-
-  // final FlutterAuthKit _authKit = FlutterAuthKit();
+  const MyHomePage({super.key});
 
   @override
   Widget build(BuildContext context) {

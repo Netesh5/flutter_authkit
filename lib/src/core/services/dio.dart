@@ -6,12 +6,16 @@ import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 @LazySingleton()
 class DioClient {
-  final TokenService _tokenService = TokenService();
+  final TokenService tokenService;
   bool _isRefreshing = false;
 
   final Dio dio;
 
-  DioClient({required this.dio});
+  DioClient(@Named('baseUrl') String baseUrl,
+      @Named('headers') Map<String, dynamic> headers, this.tokenService)
+      : dio = Dio() {
+    init(baseUrl: baseUrl, headers: headers);
+  }
 
   void init({
     required String baseUrl,
@@ -36,7 +40,7 @@ class DioClient {
   InterceptorsWrapper _interceptor() {
     return InterceptorsWrapper(
       onRequest: (options, handler) async {
-        final token = await _tokenService.getToken();
+        final token = await tokenService.getToken();
         if (token != null) {
           options.headers = {
             ...(options.headers),
@@ -70,14 +74,14 @@ class DioClient {
     }
     _isRefreshing = true;
     try {
-      final newToken = await _tokenService.getToken();
+      final newToken = await tokenService.getToken();
       if (newToken != null) {
         dio.options.headers["Authorization"] = "Bearer $newToken";
         final retryResponse = await dio.fetch(e.requestOptions);
         return handler.resolve(retryResponse);
       }
     } catch (error) {
-      await _tokenService.deleteToken();
+      await tokenService.deleteToken();
     } finally {
       _isRefreshing = false;
     }

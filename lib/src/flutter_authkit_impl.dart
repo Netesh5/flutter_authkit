@@ -1,21 +1,24 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_authkit/src/core/enums/request_type.dart';
-import 'package:flutter_authkit/src/core/handler/auth_error_handler.dart';
-import 'package:flutter_authkit/src/core/models/auth_response.dart';
-import 'package:flutter_authkit/src/core/services/dio.dart';
-import 'package:flutter_authkit/src/core/services/token_service.dart';
+import 'package:flutter_authkit/flutter_authkit.dart';
+import 'package:injectable/injectable.dart';
 
+@LazySingleton()
 class FlutterAuthKit {
-  // static final FlutterAuthKit _instance = FlutterAuthKit._internal();
-  // factory FlutterAuthKit() => _instance;
+  final TokenService tokenService;
 
-  // final DioClient _dioClient = DioClient();
-  final TokenService _tokenService = TokenService();
+  late DioClient dioClient;
+  FlutterAuthKit({required this.tokenService});
 
-  // FlutterAuthKit._internal();
+  init({required String baseUrl, Map<String, dynamic>? headers}) {
+    if (g.isRegistered<DioClient>()) {
+      g.unregister<DioClient>();
+    }
+    g.registerSingleton<DioClient>(
+      DioClient(baseUrl, headers ?? {}, tokenService),
+    );
 
-  final DioClient dioClient;
-  FlutterAuthKit({required this.dioClient});
+    dioClient = g<DioClient>();
+  }
 
   Future<T> _request<T>({
     required String endpoint,
@@ -53,9 +56,9 @@ class FlutterAuthKit {
     );
 
     if (res is AuthResponse) {
-      await _tokenService.saveToken(token: res.accessToken);
+      await tokenService.saveToken(token: res.accessToken);
       if (res.refreshToken.isNotEmpty) {
-        await _tokenService.saveRefreshToken(refreshToken: res.refreshToken);
+        await tokenService.saveRefreshToken(refreshToken: res.refreshToken);
       }
     }
     return res;
@@ -81,7 +84,7 @@ class FlutterAuthKit {
       if (logoutEndpoint.isNotEmpty) {
         await dioClient.dio.post('/$logoutEndpoint');
       }
-      await _tokenService.deleteToken();
+      await tokenService.deleteToken();
     } on DioException catch (e) {
       throw AuthErrorHandler.fromDioError(e);
     }
@@ -89,8 +92,8 @@ class FlutterAuthKit {
 
 // Get Valid Token
   Future<String> getValidToken() async {
-    final token = await _tokenService.getToken();
-    if (token != null && !await _tokenService.isTokenExpired()) {
+    final token = await tokenService.getToken();
+    if (token != null && !await tokenService.isTokenExpired()) {
       return token;
     } else {
       return await refreshAccessToken();
@@ -99,11 +102,11 @@ class FlutterAuthKit {
 
   // Refresh Access Token
   Future<String> refreshAccessToken() async {
-    final refreshToken = await _tokenService.getRefreshToken();
+    final refreshToken = await tokenService.getRefreshToken();
     final res = await dioClient.dio
         .post('/refresh-token', data: {"refreshToken": refreshToken});
     final newAccessToken = res.data['accessToken'];
-    await _tokenService.saveToken(token: newAccessToken);
+    await tokenService.saveToken(token: newAccessToken);
     return newAccessToken;
   }
 }
