@@ -5,9 +5,9 @@ import 'package:flutter_authkit/flutter_authkit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() async {
-  DioClient().init(
-    baseUrl: 'https://dummyjson.com/auth',
-  );
+  // DioClient().init(
+  //   baseUrl: 'https://dummyjson.com/auth',
+  // );
 
   runApp(const MyApp());
 }
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => LoginCubit(),
+      create: (context) => g<LoginCubit>(),
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatelessWidget {
   MyHomePage({super.key});
 
-  final FlutterAuthKit _authKit = FlutterAuthKit();
+  // final FlutterAuthKit _authKit = FlutterAuthKit();
 
   @override
   Widget build(BuildContext context) {

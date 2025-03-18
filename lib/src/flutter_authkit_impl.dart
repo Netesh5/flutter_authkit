@@ -6,13 +6,16 @@ import 'package:flutter_authkit/src/core/services/dio.dart';
 import 'package:flutter_authkit/src/core/services/token_service.dart';
 
 class FlutterAuthKit {
-  static final FlutterAuthKit _instance = FlutterAuthKit._internal();
-  factory FlutterAuthKit() => _instance;
+  // static final FlutterAuthKit _instance = FlutterAuthKit._internal();
+  // factory FlutterAuthKit() => _instance;
 
-  final DioClient _dioClient = DioClient();
+  // final DioClient _dioClient = DioClient();
   final TokenService _tokenService = TokenService();
 
-  FlutterAuthKit._internal();
+  // FlutterAuthKit._internal();
+
+  final DioClient dioClient;
+  FlutterAuthKit({required this.dioClient});
 
   Future<T> _request<T>({
     required String endpoint,
@@ -23,10 +26,10 @@ class FlutterAuthKit {
     try {
       Response response;
       if (method == RequestType.POST) {
-        response = await _dioClient.dio.post('/$endpoint', data: params);
+        response = await dioClient.dio.post('/$endpoint', data: params);
       } else if (method == RequestType.GET) {
         response =
-            await _dioClient.dio.get('/$endpoint', queryParameters: params);
+            await dioClient.dio.get('/$endpoint', queryParameters: params);
       } else {
         throw Exception("Unsupported HTTP method: $method");
       }
@@ -76,7 +79,7 @@ class FlutterAuthKit {
   Future<void> logout({required String logoutEndpoint}) async {
     try {
       if (logoutEndpoint.isNotEmpty) {
-        await _dioClient.dio.post('/$logoutEndpoint');
+        await dioClient.dio.post('/$logoutEndpoint');
       }
       await _tokenService.deleteToken();
     } on DioException catch (e) {
@@ -97,7 +100,7 @@ class FlutterAuthKit {
   // Refresh Access Token
   Future<String> refreshAccessToken() async {
     final refreshToken = await _tokenService.getRefreshToken();
-    final res = await _dioClient.dio
+    final res = await dioClient.dio
         .post('/refresh-token', data: {"refreshToken": refreshToken});
     final newAccessToken = res.data['accessToken'];
     await _tokenService.saveToken(token: newAccessToken);
