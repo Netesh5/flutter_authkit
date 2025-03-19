@@ -8,11 +8,15 @@ class FetchUserInfoCubit extends Cubit<CommonState> {
 
   fetchUserInfo() async {
     emit(LoadingState());
-    final res = await authKit.request(
-      endPoint: "/user/me",
-      method: RequestType.GET,
-      fromJson: (json) => UserModel.fromMap(json),
-    );
-    emit(SuccessState<UserModel>(data: res));
+    try {
+      final res = await authKit.request(
+        endPoint: "/user/me",
+        method: RequestType.GET,
+        fromJson: (json) => UserModel.fromMap(json),
+      );
+      emit(SuccessState<UserModel>(data: res));
+    } on Exception catch (e) {
+      emit(ErrorState(message: e.toString()));
+    }
   }
 }

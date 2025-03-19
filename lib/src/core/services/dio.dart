@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_authkit/src/core/services/token_service.dart';
@@ -67,23 +69,60 @@ class DioClient {
     );
   }
 
+  // Future<void> _handleTokenRefresh(
+  //     DioException e, ErrorInterceptorHandler handler) async {
+  //   if (_isRefreshing) {
+  //     return handler.next(e);
+  //   }
+  //   _isRefreshing = true;
+  //   try {
+  //     final newToken = await tokenService.getRefreshToken();
+  //     if (newToken != null) {
+  //       dio.options.headers["Authorization"] = "Bearer $newToken";
+  //       final retryResponse = await dio.fetch(e.requestOptions);
+  //       return handler.resolve(retryResponse);
+  //     }
+  //   } catch (error) {
+  //     await tokenService.deleteToken();
+  //   } finally {
+  //     _isRefreshing = false;
+  //   }
+
+  //   return handler.next(e);
+  // }
+
   Future<void> _handleTokenRefresh(
       DioException e, ErrorInterceptorHandler handler) async {
+    final refreshTokenCompleter = Completer<void>();
     if (_isRefreshing) {
-      return handler.next(e);
-    }
-    _isRefreshing = true;
-    try {
-      final newToken = await tokenService.getToken();
-      if (newToken != null) {
-        dio.options.headers["Authorization"] = "Bearer $newToken";
+      await refreshTokenCompleter.future;
+      if ((await tokenService.getToken()) != null) {
         final retryResponse = await dio.fetch(e.requestOptions);
         return handler.resolve(retryResponse);
+      } else {
+        return handler.reject(e);
+      }
+    }
+
+    _isRefreshing = true;
+
+    try {
+      final newToken = await tokenService.getRefreshToken();
+      if (newToken != null) {
+        await tokenService.saveToken(token: newToken);
+        dio.options.headers["Authorization"] = "Bearer $newToken";
+
+        final retryResponse = await dio.fetch(e.requestOptions);
+        return handler.resolve(retryResponse);
+      } else {
+        await tokenService.deleteToken();
       }
     } catch (error) {
       await tokenService.deleteToken();
+      return handler.reject(e);
     } finally {
       _isRefreshing = false;
+      refreshTokenCompleter.complete();
     }
 
     return handler.next(e);
