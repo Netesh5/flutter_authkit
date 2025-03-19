@@ -1,3 +1,4 @@
+import 'package:example/common/constant.dart';
 import 'package:example/cubit/di.dart';
 import 'package:example/cubit/fetch_user_info_cubit.dart';
 import 'package:example/cubit/startup_cubit.dart';
@@ -8,7 +9,7 @@ import 'package:flutter_authkit/flutter_authkit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() async {
-  injectDependecies();
+  injectDependecies(baseUrl: AppString.baseUrl);
   DI.init();
   runApp(const MyApp());
 }
@@ -89,7 +90,12 @@ class MyHomePage extends StatelessWidget {
                 child: const Text('Login'),
               ),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  // context.read<RegisterCubit>().register(
+                  //     registerEndpoint: "/",
+                  //     params: params,
+                  //     fromJson: fromJson);
+                },
                 child: const Text('Register'),
               ),
             ],

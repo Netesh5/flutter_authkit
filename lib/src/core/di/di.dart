@@ -6,9 +6,15 @@ import 'package:injectable/injectable.dart';
 final g = GetIt.instance;
 
 @InjectableInit()
-void injectDependecies() {
+void injectDependecies({
+  required String baseUrl,
+  Map<String, dynamic>? headers,
+  String? refreshEndpoint,
+}) {
   g.init();
   g<FlutterAuthKit>().init(
-    baseUrl: "https://dummyjson.com/auth",
+    baseUrl: baseUrl,
+    headers: headers,
+    refreshEndpoint: refreshEndpoint,
   );
 }
