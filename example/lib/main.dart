@@ -38,17 +38,9 @@ class _MyAppState extends State<MyApp> {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: BlocListener<LoginCubit, CommonState>(listener: (context, state) {
-          if (state is SuccessState<UserModel>) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => const Homepage(),
-              ),
-            );
-          }
-        }, child: BlocBuilder<StartupCubit, Widget>(builder: (context, state) {
+        home: BlocBuilder<StartupCubit, Widget>(builder: (context, state) {
           return state;
-        })),
+        }),
       ),
     );
   }
@@ -63,27 +55,38 @@ class MyHomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Flutter AuthKit'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            ElevatedButton(
-              onPressed: () async {
-                context.read<LoginCubit>().login(
-                    "login",
-                    {
-                      "username": "emilys",
-                      "password": "emilyspass",
-                    },
-                    (json) => UserModel.fromMap(json));
-              },
-              child: const Text('Login'),
-            ),
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text('Register'),
-            ),
-          ],
+      body: BlocListener<LoginCubit, CommonState>(
+        listener: (context, state) {
+          if (state is SuccessState<UserModel>) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => const Homepage(),
+              ),
+            );
+          }
+        },
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  context.read<LoginCubit>().login<UserModel>(
+                      "login",
+                      {
+                        "username": "emilys",
+                        "password": "emilyspass",
+                      },
+                      (json) => UserModel.fromMap(json));
+                },
+                child: const Text('Login'),
+              ),
+              ElevatedButton(
+                onPressed: () {},
+                child: const Text('Register'),
+              ),
+            ],
+          ),
         ),
       ),
     );
