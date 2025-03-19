@@ -10,8 +10,10 @@ class LoginCubit extends Cubit<CommonState> {
   // TO DOdf
   final FlutterAuthKit authKit;
   // TO DO
-  login<T>(String loginEndpoint, Map<String, dynamic> params,
-      T Function(Map<String, dynamic>) fromJson) async {
+  login<T>(
+      {required String loginEndpoint,
+      required Map<String, dynamic> params,
+      required T Function(Map<String, dynamic>) fromJson}) async {
     try {
       emit(LoadingState());
       final res = await authKit.login<T>(

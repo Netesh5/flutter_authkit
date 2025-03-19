@@ -71,13 +71,13 @@ class MyHomePage extends StatelessWidget {
             children: [
               ElevatedButton(
                 onPressed: () {
-                  context.read<LoginCubit>().login<UserModel>(
-                      "login",
-                      {
+                  context.read<LoginCubit>().login(
+                      loginEndpoint: "login",
+                      params: {
                         "username": "emilys",
                         "password": "emilyspass",
                       },
-                      (json) => UserModel.fromMap(json));
+                      fromJson: (json) => UserModel.fromMap(json));
                 },
                 child: const Text('Login'),
               ),
