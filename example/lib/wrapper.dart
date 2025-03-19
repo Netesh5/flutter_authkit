@@ -10,9 +10,9 @@ Future<Widget> wrapper(BuildContext context) async {
   final token = await tokensService.getToken();
   if (token != null) {
     if (context.mounted) {
-      return Homepage();
+      return const Homepage();
     }
   }
 
-  return MyHomePage();
+  return const MyHomePage();
 }

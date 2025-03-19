@@ -109,4 +109,19 @@ class FlutterAuthKit {
     await tokenService.saveToken(token: newAccessToken);
     return newAccessToken;
   }
+
+  Future<T> request<T>({
+    required String endPoint,
+    Map<String, dynamic>? params,
+    required RequestType method,
+    required T Function(Map<String, dynamic>) fromJson,
+  }) async {
+    final res = await _request(
+      endpoint: endPoint,
+      method: method,
+      params: params,
+      fromJson: fromJson,
+    );
+    return res;
+  }
 }

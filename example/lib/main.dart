@@ -1,3 +1,5 @@
+import 'package:example/cubit/di.dart';
+import 'package:example/cubit/fetch_user_info_cubit.dart';
 import 'package:example/cubit/startup_cubit.dart';
 import 'package:example/homepage.dart';
 import 'package:example/model/user_model.dart';
@@ -7,6 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() async {
   injectDependecies();
+  DI.init();
   runApp(const MyApp());
 }
 
@@ -30,6 +33,9 @@ class _MyAppState extends State<MyApp> {
         ),
         BlocProvider(
           create: (context) => g<LogoutCubit>(),
+        ),
+        BlocProvider(
+          create: (context) => g<FetchUserInfoCubit>(),
         ),
       ],
       child: MaterialApp(
@@ -72,7 +78,7 @@ class MyHomePage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   context.read<LoginCubit>().login(
-                      loginEndpoint: "login",
+                      loginEndpoint: "/login",
                       params: {
                         "username": "emilys",
                         "password": "emilyspass",

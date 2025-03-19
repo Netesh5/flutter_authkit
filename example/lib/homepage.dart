@@ -1,3 +1,4 @@
+import 'package:example/cubit/fetch_user_info_cubit.dart';
 import 'package:example/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_authkit/flutter_authkit.dart';
@@ -28,7 +29,10 @@ class Homepage extends StatelessWidget {
                   },
                   child: const Text("Log out")),
               TextButton(
-                  onPressed: () async {}, child: const Text("Fetch User Info")),
+                  onPressed: () async {
+                    context.read<FetchUserInfoCubit>().fetchUserInfo();
+                  },
+                  child: const Text("Fetch User Info")),
             ],
           ),
         ),
