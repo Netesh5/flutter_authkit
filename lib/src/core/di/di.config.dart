@@ -31,13 +31,14 @@ extension GetItInjectableX on _i174.GetIt {
       environmentFilter,
     );
     gh.lazySingleton<_i691.TokenService>(() => _i691.TokenService());
-    gh.lazySingleton<_i1024.FlutterAuthKit>(
-        () => _i1024.FlutterAuthKit(tokenService: gh<_i701.TokenService>()));
     gh.lazySingleton<_i8.DioClient>(() => _i8.DioClient(
           gh<String>(instanceName: 'baseUrl'),
           gh<Map<String, dynamic>>(instanceName: 'headers'),
           gh<_i691.TokenService>(),
+          gh<String>(instanceName: 'refreshEndpoint'),
         ));
+    gh.lazySingleton<_i1024.FlutterAuthKit>(
+        () => _i1024.FlutterAuthKit(tokenService: gh<_i701.TokenService>()));
     gh.factory<_i351.LoginCubit>(
         () => _i351.LoginCubit(authKit: gh<_i701.FlutterAuthKit>()));
     gh.factory<_i231.LogoutCubit>(

@@ -13,10 +13,13 @@ class DioClient {
 
   final Dio dio;
 
-  DioClient(@Named('baseUrl') String baseUrl,
-      @Named('headers') Map<String, dynamic> headers, this.tokenService)
+  DioClient(
+      @Named('baseUrl') String baseUrl,
+      @Named('headers') Map<String, dynamic> headers,
+      this.tokenService,
+      @Named('refreshEndpoint') String refreshEndpoint)
       : dio = Dio() {
-    init(baseUrl: baseUrl, headers: headers);
+    init(baseUrl: baseUrl, headers: headers, refreshEndpoint: refreshEndpoint);
   }
 
   void init({
@@ -24,6 +27,7 @@ class DioClient {
     int connectionTimeoutMs = 5000,
     int receiveTimeoutMs = 5000,
     Map<String, dynamic>? headers,
+    String? refreshEndpoint,
   }) {
     dio.options = (BaseOptions(
       baseUrl: baseUrl,
@@ -32,14 +36,14 @@ class DioClient {
       headers: headers ?? {'Content-Type': 'application/json'},
     ));
 
-    dio.interceptors.add(_interceptor());
+    dio.interceptors.add(_interceptor(refreshEndpoint: refreshEndpoint));
     if (kDebugMode) {
       dio.interceptors
           .add(PrettyDioLogger(requestBody: true, responseBody: true));
     }
   }
 
-  InterceptorsWrapper _interceptor() {
+  InterceptorsWrapper _interceptor({String? refreshEndpoint}) {
     return InterceptorsWrapper(
       onRequest: (options, handler) async {
         final token = await tokenService.getToken();
@@ -62,7 +66,8 @@ class DioClient {
       },
       onError: (DioException e, handler) async {
         if (e.response?.statusCode == 401) {
-          return _handleTokenRefresh(e, handler);
+          return _handleTokenRefresh(e, handler,
+              refreshEndpoint: refreshEndpoint);
         }
         return handler.next(e);
       },
@@ -70,7 +75,8 @@ class DioClient {
   }
 
   Future<void> _handleTokenRefresh(
-      DioException e, ErrorInterceptorHandler handler) async {
+      DioException e, ErrorInterceptorHandler handler,
+      {String? refreshEndpoint}) async {
     if (_isRefreshing) {
       return handler.next(e); // If already refreshing, just proceed
     }

@@ -9,12 +9,15 @@ class FlutterAuthKit {
   late DioClient dioClient;
   FlutterAuthKit({required this.tokenService});
 
-  init({required String baseUrl, Map<String, dynamic>? headers}) {
+  init(
+      {required String baseUrl,
+      Map<String, dynamic>? headers,
+      String? refreshEndpoint}) {
     if (g.isRegistered<DioClient>()) {
       g.unregister<DioClient>();
     }
     g.registerSingleton<DioClient>(
-      DioClient(baseUrl, headers ?? {}, tokenService),
+      DioClient(baseUrl, headers ?? {}, tokenService, refreshEndpoint ?? ""),
     );
 
     dioClient = g<DioClient>();
