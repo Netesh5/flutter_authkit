@@ -93,25 +93,25 @@ class FlutterAuthKit {
     }
   }
 
-// Get Valid Token
-  Future<String> getValidToken() async {
-    final token = await tokenService.getToken();
-    if (token != null && !await tokenService.isTokenExpired()) {
-      return token;
-    } else {
-      return await refreshAccessToken();
-    }
-  }
+// // Get Valid Token
+//   Future<String> getValidToken() async {
+//     final token = await tokenService.getToken();
+//     if (token != null && !await tokenService.isTokenExpired()) {
+//       return token;
+//     } else {
+//       return await refreshAccessToken();
+//     }
+//   }
 
-  // Refresh Access Token
-  Future<String> refreshAccessToken() async {
-    final refreshToken = await tokenService.getRefreshToken();
-    final res = await dioClient.dio
-        .post('/refresh-token', data: {"refreshToken": refreshToken});
-    final newAccessToken = res.data['accessToken'];
-    await tokenService.saveToken(token: newAccessToken);
-    return newAccessToken;
-  }
+//   // Refresh Access Token
+//   Future<String> refreshAccessToken() async {
+//     final refreshToken = await tokenService.getRefreshToken();
+//     final res = await dioClient.dio
+//         .post('/refresh-token', data: {"refreshToken": refreshToken});
+//     final newAccessToken = res.data['accessToken'];
+//     await tokenService.saveToken(token: newAccessToken);
+//     return newAccessToken;
+//   }
 
   Future<T> request<T>({
     required String endPoint,
