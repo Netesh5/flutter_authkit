@@ -20,11 +20,17 @@ class Homepage extends StatelessWidget {
           }
         },
         child: Center(
-          child: TextButton(
-              onPressed: () async {
-                context.read<LogoutCubit>().logOut();
-              },
-              child: const Text("Log out")),
+          child: Column(
+            children: [
+              TextButton(
+                  onPressed: () async {
+                    context.read<LogoutCubit>().logOut();
+                  },
+                  child: const Text("Log out")),
+              TextButton(
+                  onPressed: () async {}, child: const Text("Fetch User Info")),
+            ],
+          ),
         ),
       ),
     );

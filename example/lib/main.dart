@@ -76,6 +76,7 @@ class MyHomePage extends StatelessWidget {
                       params: {
                         "username": "emilys",
                         "password": "emilyspass",
+                        "expiresInMins": 1,
                       },
                       fromJson: (json) => UserModel.fromMap(json));
                 },
