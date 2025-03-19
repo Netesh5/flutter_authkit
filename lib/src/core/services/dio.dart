@@ -69,62 +69,53 @@ class DioClient {
     );
   }
 
-  // Future<void> _handleTokenRefresh(
-  //     DioException e, ErrorInterceptorHandler handler) async {
-  //   if (_isRefreshing) {
-  //     return handler.next(e);
-  //   }
-  //   _isRefreshing = true;
-  //   try {
-  //     final newToken = await tokenService.getRefreshToken();
-  //     if (newToken != null) {
-  //       dio.options.headers["Authorization"] = "Bearer $newToken";
-  //       final retryResponse = await dio.fetch(e.requestOptions);
-  //       return handler.resolve(retryResponse);
-  //     }
-  //   } catch (error) {
-  //     await tokenService.deleteToken();
-  //   } finally {
-  //     _isRefreshing = false;
-  //   }
-
-  //   return handler.next(e);
-  // }
-
   Future<void> _handleTokenRefresh(
       DioException e, ErrorInterceptorHandler handler) async {
-    final refreshTokenCompleter = Completer<void>();
     if (_isRefreshing) {
-      await refreshTokenCompleter.future;
-      if ((await tokenService.getToken()) != null) {
-        final retryResponse = await dio.fetch(e.requestOptions);
-        return handler.resolve(retryResponse);
-      } else {
-        return handler.reject(e);
-      }
+      return handler.next(e); // If already refreshing, just proceed
     }
 
     _isRefreshing = true;
 
     try {
-      final newToken = await tokenService.getRefreshToken();
-      if (newToken != null) {
-        await tokenService.saveToken(token: newToken);
-        dio.options.headers["Authorization"] = "Bearer $newToken";
-
+      final newAccessToken = await refreshAccessToken();
+      if (newAccessToken != null) {
+        dio.options.headers["Authorization"] = "Bearer $newAccessToken";
         final retryResponse = await dio.fetch(e.requestOptions);
         return handler.resolve(retryResponse);
-      } else {
-        await tokenService.deleteToken();
       }
     } catch (error) {
-      await tokenService.deleteToken();
-      return handler.reject(e);
+      await tokenService.deleteToken(); // Clear tokens if refresh fails
     } finally {
       _isRefreshing = false;
-      refreshTokenCompleter.complete();
     }
 
     return handler.next(e);
+  }
+
+  Future<String?> refreshAccessToken({String? refreshEndpoint}) async {
+    final refreshToken = await tokenService.getRefreshToken();
+    if (refreshToken == null) return null;
+
+    try {
+      final response = await dio.post(
+        refreshEndpoint ?? '/refresh',
+        data: {"refreshToken": refreshToken},
+      );
+
+      final newAccessToken = response.data['accessToken'];
+      final newRefreshToken = response.data['refreshToken'];
+
+      // Save the new tokens
+      await tokenService.saveToken(token: newAccessToken);
+      if (newRefreshToken != null) {
+        await tokenService.saveRefreshToken(refreshToken: newRefreshToken);
+      }
+
+      return newAccessToken;
+    } catch (e) {
+      await tokenService.deleteToken(); // Logout if refresh fails
+      return null;
+    }
   }
 }
