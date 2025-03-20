@@ -1,5 +1,9 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_authkit/flutter_authkit.dart';
+import 'package:flutter_authkit/src/core/handler/cancle_handler.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:injectable/injectable.dart';
 
 @LazySingleton()
@@ -8,6 +12,8 @@ class FlutterAuthKit {
 
   late DioClient dioClient;
   FlutterAuthKit({required this.tokenService});
+
+  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
 
   init(
       {required String baseUrl,
@@ -93,26 +99,6 @@ class FlutterAuthKit {
     }
   }
 
-// // Get Valid Token
-//   Future<String> getValidToken() async {
-//     final token = await tokenService.getToken();
-//     if (token != null && !await tokenService.isTokenExpired()) {
-//       return token;
-//     } else {
-//       return await refreshAccessToken();
-//     }
-//   }
-
-//   // Refresh Access Token
-//   Future<String> refreshAccessToken() async {
-//     final refreshToken = await tokenService.getRefreshToken();
-//     final res = await dioClient.dio
-//         .post('/refresh-token', data: {"refreshToken": refreshToken});
-//     final newAccessToken = res.data['accessToken'];
-//     await tokenService.saveToken(token: newAccessToken);
-//     return newAccessToken;
-//   }
-
   Future<T> request<T>({
     required String endPoint,
     Map<String, dynamic>? params,
@@ -126,5 +112,31 @@ class FlutterAuthKit {
       fromJson: fromJson,
     );
     return res;
+  }
+
+  loginWithGoogle<T>(
+      {required String googleEndpoint,
+      Map<String, dynamic>? params,
+      required T Function(Map<String, dynamic>) fromJson}) async {
+    try {
+      final googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) throw const CancleHandler();
+      final googleAuth = await googleUser.authentication;
+      final token = googleAuth.accessToken;
+
+      if (token == null) throw "Failed to fetch token";
+
+      log(token, name: "Google Token");
+
+      final res = await _request(
+        endpoint: googleEndpoint,
+        method: RequestType.POST,
+        params: params,
+        fromJson: fromJson,
+      );
+      return res;
+    } on DioException catch (e) {
+      throw AuthErrorHandler.fromDioError(e);
+    }
   }
 }
