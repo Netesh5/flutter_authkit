@@ -5,6 +5,7 @@ import 'package:flutter_authkit/flutter_authkit.dart';
 import 'package:flutter_authkit/src/core/handler/cancle_handler.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:injectable/injectable.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 @LazySingleton()
 class FlutterAuthKit {
@@ -137,6 +138,29 @@ class FlutterAuthKit {
       return res;
     } on DioException catch (e) {
       throw AuthErrorHandler.fromDioError(e);
+    } catch (e) {
+      throw Exception("Something went wrong: $e");
+    }
+  }
+
+  loginWithApple<T>() async {
+    try {
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+      if (credential.identityToken == null) throw "Failed to fetch token";
+      final token = credential.identityToken;
+      log(token!, name: "Apple Token");
+    } on SignInWithAppleAuthorizationException catch (e) {
+      if (e.code == AuthorizationErrorCode.canceled) {
+        throw const CancleHandler();
+      }
+      rethrow;
+    } catch (e) {
+      throw Exception("Something went wrong: $e");
     }
   }
 }
