@@ -9,9 +9,9 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:flutter_authkit/flutter_authkit.dart' as _i701;
-import 'package:flutter_authkit/src/core/cubits/auth_cubits/login_cubit.dart'
+import 'package:flutter_authkit/src/core/cubits/email_auth_cubits/login_cubit.dart'
     as _i351;
-import 'package:flutter_authkit/src/core/cubits/auth_cubits/logout_cubit.dart'
+import 'package:flutter_authkit/src/core/cubits/email_auth_cubits/logout_cubit.dart'
     as _i231;
 import 'package:flutter_authkit/src/core/services/dio.dart' as _i8;
 import 'package:flutter_authkit/src/core/services/token_service.dart' as _i691;
