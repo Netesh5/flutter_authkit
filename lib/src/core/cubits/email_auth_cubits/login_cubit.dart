@@ -5,11 +5,7 @@ import 'package:injectable/injectable.dart';
 @injectable
 class LoginCubit extends Cubit<CommonState> {
   LoginCubit({required this.authKit}) : super(InitialState());
-  // TEMP
-
-  // TO DOdf
   final FlutterAuthKit authKit;
-  // TO DO
   login<T>(
       {required String loginEndpoint,
       required Map<String, dynamic> params,
@@ -23,6 +19,4 @@ class LoginCubit extends Cubit<CommonState> {
       emit(ErrorState(message: e.toString()));
     }
   }
-
-  // TO DO
 }

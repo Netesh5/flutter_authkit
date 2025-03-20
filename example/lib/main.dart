@@ -102,30 +102,15 @@ class MyHomePage extends StatelessWidget {
               const Divider(),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
-                  // context.read<RegisterCubit>().register(
-                  //     registerEndpoint: "/",
-                  //     params: params,
-                  //     fromJson: fromJson);
-                },
+                onPressed: () {},
                 child: const Text('Google Login'),
               ),
               ElevatedButton(
-                onPressed: () {
-                  // context.read<RegisterCubit>().register(
-                  //     registerEndpoint: "/",
-                  //     params: params,
-                  //     fromJson: fromJson);
-                },
+                onPressed: () {},
                 child: const Text('Facebook Login'),
               ),
               ElevatedButton(
-                onPressed: () {
-                  // context.read<RegisterCubit>().register(
-                  //     registerEndpoint: "/",
-                  //     params: params,
-                  //     fromJson: fromJson);
-                },
+                onPressed: () {},
                 child: const Text('Apple Login'),
               ),
             ],
