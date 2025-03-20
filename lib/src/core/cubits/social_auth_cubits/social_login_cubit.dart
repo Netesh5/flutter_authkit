@@ -1,5 +1,4 @@
 import 'package:flutter_authkit/flutter_authkit.dart';
-import 'package:flutter_authkit/src/core/enums/social_auth_types.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
