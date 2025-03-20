@@ -102,7 +102,15 @@ class MyHomePage extends StatelessWidget {
               const Divider(),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  context.read<SocialLoginCubit>().socialLogin<UserModel>(
+                      type: SocialAuthTypes.google,
+                      endpoint: "/auth/social",
+                      fromJson: (json) => UserModel.fromMap(json),
+                      params: {
+                        "type": SocialAuthTypes.google.name,
+                      });
+                },
                 child: const Text('Google Login'),
               ),
               ElevatedButton(
