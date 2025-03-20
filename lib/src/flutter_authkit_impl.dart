@@ -9,6 +9,9 @@ import 'package:injectable/injectable.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 @LazySingleton()
+
+/// A class that provides authentication functionalities such as login, register,
+/// logout, and social login (Google, Apple, Facebook).
 class FlutterAuthKit {
   final TokenService tokenService;
 
@@ -18,6 +21,13 @@ class FlutterAuthKit {
   final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
   final client = FacebookAuth.instance;
 
+  /// Initializes the DioClient with the given base URL, headers, and refresh endpoint.
+  ///
+  /// Example:
+  /// ```dart
+  /// final authKit = FlutterAuthKit(tokenService: tokenService);
+  /// authKit.init(baseUrl: "https://api.example.com", headers: {"Authorization": "Bearer token"});
+  /// ```
   init(
       {required String baseUrl,
       Map<String, dynamic>? headers,
@@ -32,29 +42,16 @@ class FlutterAuthKit {
     dioClient = g<DioClient>();
   }
 
-  Future<T> _request<T>({
-    required String endpoint,
-    required RequestType method,
-    Map<String, dynamic>? params,
-    required T Function(Map<String, dynamic>) fromJson,
-  }) async {
-    try {
-      Response response;
-      if (method == RequestType.POST) {
-        response = await dioClient.dio.post('/$endpoint', data: params);
-      } else if (method == RequestType.GET) {
-        response =
-            await dioClient.dio.get('/$endpoint', queryParameters: params);
-      } else {
-        throw Exception("Unsupported HTTP method: $method");
-      }
-      return fromJson(response.data);
-    } on DioException catch (e) {
-      throw AuthErrorHandler.fromDioError(e);
-    }
-  }
-
-  // For Login
+  /// Logs in a user using the provided login endpoint and parameters.
+  ///
+  /// Example:
+  /// ```dart
+  /// final response = await authKit.login(
+  ///   loginEndpoint: "auth/login",
+  ///   params: {"email": "user@example.com", "password": "password123"},
+  ///   fromJson: AuthResponse.fromJson,
+  /// );
+  /// ```
   Future<T> login<T>({
     required String loginEndpoint,
     Map<String, dynamic>? params,
@@ -76,7 +73,16 @@ class FlutterAuthKit {
     return res;
   }
 
-  // For Register
+  /// Registers a new user using the provided register endpoint and parameters.
+  ///
+  /// Example:
+  /// ```dart
+  /// final response = await authKit.register(
+  ///   registerEndpoint: "auth/register",
+  ///   params: {"email": "user@example.com", "password": "password123"},
+  ///   fromJson: AuthResponse.fromJson,
+  /// );
+  /// ```
   Future<T> register<T>({
     required String registerEndpoint,
     Map<String, dynamic>? params,
@@ -90,7 +96,12 @@ class FlutterAuthKit {
     );
   }
 
-  // For Logout
+  /// Logs out the user and optionally calls a logout endpoint.
+  ///
+  /// Example:
+  /// ```dart
+  /// await authKit.logout(logoutEndpoint: "auth/logout");
+  /// ```
   Future<void> logout({String? logoutEndpoint}) async {
     try {
       if (logoutEndpoint != null) {
@@ -102,6 +113,16 @@ class FlutterAuthKit {
     }
   }
 
+  /// Sends a custom request to the specified endpoint.
+  ///
+  /// Example:
+  /// ```dart
+  /// final response = await authKit.request(
+  ///   endPoint: "user/profile",
+  ///   method: RequestType.GET,
+  ///   fromJson: UserProfile.fromJson,
+  /// );
+  /// ```
   Future<T> request<T>({
     required String endPoint,
     Map<String, dynamic>? params,
@@ -117,6 +138,15 @@ class FlutterAuthKit {
     return res;
   }
 
+  /// Logs in a user using Google authentication.
+  ///
+  /// Example:
+  /// ```dart
+  /// final response = await authKit.loginWithGoogle(
+  ///   googleEndpoint: "auth/google",
+  ///   fromJson: AuthResponse.fromJson,
+  /// );
+  /// ```
   Future<T> loginWithGoogle<T>({
     required String googleEndpoint,
     Map<String, dynamic>? params,
@@ -144,6 +174,15 @@ class FlutterAuthKit {
     }
   }
 
+  /// Logs in a user using Apple authentication.
+  ///
+  /// Example:
+  /// ```dart
+  /// final response = await authKit.loginWithApple(
+  ///   appleEndpoint: "auth/apple",
+  ///   fromJson: AuthResponse.fromJson,
+  /// );
+  /// ```
   Future<T> loginWithApple<T>({
     required String appleEndpoint,
     Map<String, dynamic>? params,
@@ -178,6 +217,15 @@ class FlutterAuthKit {
     }
   }
 
+  /// Logs in a user using Facebook authentication.
+  ///
+  /// Example:
+  /// ```dart
+  /// final response = await authKit.loginWithFacebook(
+  ///   facebookEndpoint: "auth/facebook",
+  ///   fromJson: AuthResponse.fromJson,
+  /// );
+  /// ```
   Future<T> loginWithFacebook<T>({
     required String facebookEndpoint,
     Map<String, dynamic>? params,
@@ -204,6 +252,28 @@ class FlutterAuthKit {
       throw AuthErrorHandler.fromDioError(e);
     } catch (e) {
       throw Exception(e.toString());
+    }
+  }
+
+  Future<T> _request<T>({
+    required String endpoint,
+    required RequestType method,
+    Map<String, dynamic>? params,
+    required T Function(Map<String, dynamic>) fromJson,
+  }) async {
+    try {
+      Response response;
+      if (method == RequestType.POST) {
+        response = await dioClient.dio.post('/$endpoint', data: params);
+      } else if (method == RequestType.GET) {
+        response =
+            await dioClient.dio.get('/$endpoint', queryParameters: params);
+      } else {
+        throw Exception("Unsupported HTTP method: $method");
+      }
+      return fromJson(response.data);
+    } on DioException catch (e) {
+      throw AuthErrorHandler.fromDioError(e);
     }
   }
 }
