@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter_authkit/flutter_authkit.dart';
 import 'package:flutter_authkit/src/core/handler/cancle_handler.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:injectable/injectable.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -15,6 +16,7 @@ class FlutterAuthKit {
   FlutterAuthKit({required this.tokenService});
 
   final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+  final client = FacebookAuth.instance;
 
   init(
       {required String baseUrl,
@@ -121,7 +123,7 @@ class FlutterAuthKit {
       required T Function(Map<String, dynamic>) fromJson}) async {
     try {
       final googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) throw const CancleHandler();
+      if (googleUser == null) throw const CancelHandler();
       final googleAuth = await googleUser.authentication;
       final token = googleAuth.accessToken;
 
@@ -139,11 +141,14 @@ class FlutterAuthKit {
     } on DioException catch (e) {
       throw AuthErrorHandler.fromDioError(e);
     } catch (e) {
-      throw Exception("Something went wrong: $e");
+      throw Exception(e.toString());
     }
   }
 
-  loginWithApple<T>() async {
+  loginWithApple<T>(
+      {required String appleEndpoint,
+      Map<String, dynamic>? params,
+      required T Function(Map<String, dynamic>) fromJson}) async {
     try {
       final credential = await SignInWithApple.getAppleIDCredential(
         scopes: [
@@ -154,13 +159,49 @@ class FlutterAuthKit {
       if (credential.identityToken == null) throw "Failed to fetch token";
       final token = credential.identityToken;
       log(token!, name: "Apple Token");
+
+      final res = await _request(
+          endpoint: appleEndpoint,
+          method: RequestType.POST,
+          params: params,
+          fromJson: fromJson);
+      return res;
     } on SignInWithAppleAuthorizationException catch (e) {
       if (e.code == AuthorizationErrorCode.canceled) {
-        throw const CancleHandler();
+        throw const CancelHandler();
       }
       rethrow;
+    } on DioException catch (e) {
+      throw AuthErrorHandler.fromDioError(e);
     } catch (e) {
-      throw Exception("Something went wrong: $e");
+      throw Exception(e.toString());
+    }
+  }
+
+  loginWithFacebook<T>(
+      {required String appleEndpoint,
+      Map<String, dynamic>? params,
+      required T Function(Map<String, dynamic>) fromJson}) async {
+    try {
+      final result = await client.login();
+      if (result.status == LoginStatus.success) {
+        final AccessToken accessToken = result.accessToken!;
+        log(accessToken.tokenString, name: "Facebook Token");
+        final res = await _request(
+            endpoint: appleEndpoint,
+            method: RequestType.POST,
+            params: params,
+            fromJson: fromJson);
+        return res;
+      } else if (result.status == LoginStatus.cancelled) {
+        throw const CancelHandler();
+      } else {
+        throw "Facebook sign in failed";
+      }
+    } on DioException catch (e) {
+      throw AuthErrorHandler.fromDioError(e);
+    } catch (e) {
+      throw Exception(e.toString());
     }
   }
 }
