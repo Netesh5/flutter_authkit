@@ -117,27 +117,26 @@ class FlutterAuthKit {
     return res;
   }
 
-  loginWithGoogle<T>(
-      {required String googleEndpoint,
-      Map<String, dynamic>? params,
-      required T Function(Map<String, dynamic>) fromJson}) async {
+  Future<T> loginWithGoogle<T>({
+    required String googleEndpoint,
+    Map<String, dynamic>? params,
+    required T Function(Map<String, dynamic>) fromJson,
+  }) async {
     try {
       final googleUser = await _googleSignIn.signIn();
       if (googleUser == null) throw const CancelHandler();
-      final googleAuth = await googleUser.authentication;
-      final token = googleAuth.accessToken;
 
-      if (token == null) throw "Failed to fetch token";
+      final googleAuth = await googleUser.authentication;
+      final token = googleAuth.accessToken ?? (throw "Failed to fetch token");
 
       log(token, name: "Google Token");
 
-      final res = await _request(
+      return await _request(
         endpoint: googleEndpoint,
         method: RequestType.POST,
-        params: params,
+        params: {...?params, 'token': token},
         fromJson: fromJson,
       );
-      return res;
     } on DioException catch (e) {
       throw AuthErrorHandler.fromDioError(e);
     } catch (e) {
@@ -145,10 +144,11 @@ class FlutterAuthKit {
     }
   }
 
-  loginWithApple<T>(
-      {required String appleEndpoint,
-      Map<String, dynamic>? params,
-      required T Function(Map<String, dynamic>) fromJson}) async {
+  Future<T> loginWithApple<T>({
+    required String appleEndpoint,
+    Map<String, dynamic>? params,
+    required T Function(Map<String, dynamic>) fromJson,
+  }) async {
     try {
       final credential = await SignInWithApple.getAppleIDCredential(
         scopes: [
@@ -156,16 +156,16 @@ class FlutterAuthKit {
           AppleIDAuthorizationScopes.fullName,
         ],
       );
-      if (credential.identityToken == null) throw "Failed to fetch token";
-      final token = credential.identityToken;
-      log(token!, name: "Apple Token");
 
-      final res = await _request(
-          endpoint: appleEndpoint,
-          method: RequestType.POST,
-          params: params,
-          fromJson: fromJson);
-      return res;
+      final token = credential.identityToken ?? (throw "Failed to fetch token");
+      log(token, name: "Apple Token");
+
+      return await _request(
+        endpoint: appleEndpoint,
+        method: RequestType.POST,
+        params: {...?params, 'token': token},
+        fromJson: fromJson,
+      );
     } on SignInWithAppleAuthorizationException catch (e) {
       if (e.code == AuthorizationErrorCode.canceled) {
         throw const CancelHandler();
@@ -178,21 +178,23 @@ class FlutterAuthKit {
     }
   }
 
-  loginWithFacebook<T>(
-      {required String appleEndpoint,
-      Map<String, dynamic>? params,
-      required T Function(Map<String, dynamic>) fromJson}) async {
+  Future<T> loginWithFacebook<T>({
+    required String facebookEndpoint,
+    Map<String, dynamic>? params,
+    required T Function(Map<String, dynamic>) fromJson,
+  }) async {
     try {
       final result = await client.login();
       if (result.status == LoginStatus.success) {
-        final AccessToken accessToken = result.accessToken!;
-        log(accessToken.tokenString, name: "Facebook Token");
-        final res = await _request(
-            endpoint: appleEndpoint,
-            method: RequestType.POST,
-            params: params,
-            fromJson: fromJson);
-        return res;
+        final token = result.accessToken ?? (throw "Failed to fetch token");
+        log(token.tokenString, name: "Facebook Token");
+
+        return await _request(
+          endpoint: facebookEndpoint,
+          method: RequestType.POST,
+          params: {...?params, 'token': token.tokenString},
+          fromJson: fromJson,
+        );
       } else if (result.status == LoginStatus.cancelled) {
         throw const CancelHandler();
       } else {
