@@ -13,7 +13,7 @@ import 'package:flutter_authkit/src/core/cubits/email_auth_cubits/login_cubit.da
     as _i444;
 import 'package:flutter_authkit/src/core/cubits/email_auth_cubits/logout_cubit.dart'
     as _i531;
-import 'package:flutter_authkit/src/core/cubits/social_auth_cubits/google_login_cubit.dart'
+import 'package:flutter_authkit/src/core/cubits/social_auth_cubits/social_login_cubit.dart'
     as _i27;
 import 'package:flutter_authkit/src/core/services/dio.dart' as _i8;
 import 'package:flutter_authkit/src/core/services/token_service.dart' as _i691;
