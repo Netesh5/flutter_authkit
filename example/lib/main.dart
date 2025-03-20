@@ -108,7 +108,7 @@ class MyHomePage extends StatelessWidget {
                       endpoint: "/auth/social",
                       fromJson: (json) => UserModel.fromMap(json),
                       params: {
-                        "type": SocialAuthTypes.google.name,
+                        "type": SocialAuthTypes.google.name.toLowerCase(),
                       });
                 },
                 child: const Text('Google Login'),
