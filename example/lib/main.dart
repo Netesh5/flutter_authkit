@@ -24,30 +24,26 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) => g<LoginCubit>(),
+    return AuthkitWrapper(
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => StartupCubit()..init(),
+          ),
+          BlocProvider(
+            create: (context) => g<FetchUserInfoCubit>(),
+          ),
+        ],
+        child: MaterialApp(
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            useMaterial3: true,
+          ),
+          home: BlocBuilder<StartupCubit, Widget>(builder: (context, state) {
+            return state;
+          }),
         ),
-        BlocProvider(
-          create: (context) => StartupCubit()..init(),
-        ),
-        BlocProvider(
-          create: (context) => g<LogoutCubit>(),
-        ),
-        BlocProvider(
-          create: (context) => g<FetchUserInfoCubit>(),
-        ),
-      ],
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
-        home: BlocBuilder<StartupCubit, Widget>(builder: (context, state) {
-          return state;
-        }),
       ),
     );
   }

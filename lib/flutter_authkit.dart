@@ -13,3 +13,4 @@ export 'src/core/cubits/email_auth_cubits/logout_cubit.dart';
 export 'src/core/cubits/email_auth_cubits/register_cubit.dart';
 export 'src/core/cubits/social_auth_cubits/social_login_cubit.dart';
 export 'src/core/enums/social_auth_types.dart';
+export 'src/authkit_wrapper.dart';
