@@ -64,12 +64,7 @@ class FlutterAuthKit {
       fromJson: fromJson,
     );
 
-    if (res is AuthResponse) {
-      await tokenService.saveToken(token: res.accessToken);
-      if (res.refreshToken.isNotEmpty) {
-        await tokenService.saveRefreshToken(refreshToken: res.refreshToken);
-      }
-    }
+    await _saveToken(res);
     return res;
   }
 
@@ -161,12 +156,14 @@ class FlutterAuthKit {
 
       log(token, name: "Google Token");
 
-      return await _request(
+      final res = await _request(
         endpoint: googleEndpoint,
         method: RequestType.POST,
         params: {...?params, 'token': token},
         fromJson: fromJson,
       );
+      await _saveToken(res);
+      return res;
     } on DioException catch (e) {
       throw AuthErrorHandler.fromDioError(e);
     } catch (e) {
@@ -199,12 +196,14 @@ class FlutterAuthKit {
       final token = credential.identityToken ?? (throw "Failed to fetch token");
       log(token, name: "Apple Token");
 
-      return await _request(
+      final res = await _request(
         endpoint: appleEndpoint,
         method: RequestType.POST,
         params: {...?params, 'token': token},
         fromJson: fromJson,
       );
+      await _saveToken(res);
+      return res;
     } on SignInWithAppleAuthorizationException catch (e) {
       if (e.code == AuthorizationErrorCode.canceled) {
         throw const CancelHandler();
@@ -237,12 +236,15 @@ class FlutterAuthKit {
         final token = result.accessToken ?? (throw "Failed to fetch token");
         log(token.tokenString, name: "Facebook Token");
 
-        return await _request(
+        final res = await _request(
           endpoint: facebookEndpoint,
           method: RequestType.POST,
           params: {...?params, 'token': token.tokenString},
           fromJson: fromJson,
         );
+
+        await _saveToken(res);
+        return res;
       } else if (result.status == LoginStatus.cancelled) {
         throw const CancelHandler();
       } else {
@@ -274,6 +276,15 @@ class FlutterAuthKit {
       return fromJson(response.data);
     } on DioException catch (e) {
       throw AuthErrorHandler.fromDioError(e);
+    }
+  }
+
+  _saveToken<T>(T res) async {
+    if (res is AuthResponse) {
+      await tokenService.saveToken(token: res.accessToken);
+      if (res.refreshToken.isNotEmpty) {
+        await tokenService.saveRefreshToken(refreshToken: res.refreshToken);
+      }
     }
   }
 }

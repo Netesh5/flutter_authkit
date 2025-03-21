@@ -7,13 +7,16 @@ class AuthkitWrapper extends StatelessWidget {
   final Widget child;
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(providers: [
-      BlocProvider(
-        create: (context) => g<LoginCubit>(),
-      ),
-      BlocProvider(
-        create: (context) => g<LogoutCubit>(),
-      ),
-    ], child: child);
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => g<LoginCubit>(),
+        ),
+        BlocProvider(
+          create: (context) => g<LogoutCubit>(),
+        ),
+      ],
+      child: child,
+    );
   }
 }
